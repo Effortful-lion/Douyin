@@ -1,0 +1,63 @@
+# 应该是放到 discovery 中保存的
+Gin:
+  AppMode: "debug"
+  HttpHost: "0.0.0.0"
+  HttpPort: 8080
+
+MySQL:
+  DBHost: "127.0.0.1"
+  DBPort: 3306
+  DBUser: "root"
+  DBPassWord: "mysql123"
+  DBName: "tiktok"
+  Charset: "utf8mb4"
+
+Etcd:
+  EtcdHost: "127.0.0.1"
+  EtcdPort: 2379
+
+Jaeger:
+  JaegerHost: "127.0.0.1"
+  JaegerPort: 6831
+
+Redis:
+  RedisHost: "127.0.0.1"
+  RedisPort: 6379
+  RedisPassword: "123456"
+
+Service:
+  UserServiceAddress: "127.0.0.1:8081"
+  VideoServiceAddress: "127.0.0.1:8082"
+  FavoriteServiceAddress: "127.0.0.1:8083"
+  CommentServiceAddress: "127.0.0.1:8084"
+  RelationServiceAddress: "127.0.0.1:8085"
+  MessageServiceAddress: "127.0.0.1:8086"
+  TestServiceAddress: "127.0.0.1:8087"
+
+Domain:
+  TestServiceDomain: "test"
+  UserServiceDomain: "user"
+  VideoServiceDomain: "video"
+  FavoriteServiceDomain: "favorite"
+  CommentServiceDomain: "comment"
+  RelationServiceDomain: "relation"
+  MessageServiceDomain: "message"
+
+RabbitMQ:
+  RabbitMQ: "amqp"
+  RabbitMQHost: "127.0.0.1"
+  RabbitMQPort: 5672
+  RabbitMQUser: "guest"
+  RabbitMQPassWord: "guest"
+
+User:
+  Avatar: "https://ts1.tc.mm.bing.net/th/id/R-C.66d7b796377883a92aad65b283ef1f84?rik=sQ%2fKoYAcr%2bOwsw&riu=http%3a%2f%2fwww.quazero.com%2fuploads%2fallimg%2f140305%2f1-140305131415.jpg&ehk=Hxl%2fQ9pbEiuuybrGWTEPJOhvrFK9C3vyCcWicooXfNE%3d&risl=&pid=ImgRaw&r=0"
+  Background: "https://ts1.tc.mm.bing.net/th/id/R-C.66d7b796377883a92aad65b283ef1f84?rik=sQ%2fKoYAcr%2bOwsw&riu=http%3a%2f%2fwww.quazero.com%2fuploads%2fallimg%2f140305%2f1-140305131415.jpg&ehk=Hxl%2fQ9pbEiuuybrGWTEPJOhvrFK9C3vyCcWicooXfNE%3d&risl=&pid=ImgRaw&r=0"
+  Signature: 又来看我的主页啦~
+
+# TODO 阿里云 oss 配置
+AliYun:
+  Bucket: your bucket
+  AccessKey: your access key
+  SecretKey: your secret key
+  Domain: your domain
