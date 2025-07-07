@@ -8,6 +8,7 @@ import (
 )
 
 func SendMessage2MQ(body []byte, queueName string) error {
+	// 将 json 格式的 req 数据发送到消息队列
 	log.Println("Starting to send message...")
 	// 检查连接是否有效
 	if RabbitMQ == nil || RabbitMQ.IsClosed() {
@@ -40,6 +41,7 @@ func SendMessage2MQ(body []byte, queueName string) error {
 	confirms := VideoMessageChannel.NotifyPublish(make(chan amqp.Confirmation, 10))
 
 	log.Println("Publishing message...")
+	// TODO 这里 body 太大了，消息队列无法传递（报错）
 	err = VideoMessageChannel.Publish(
 		"",     // default exchange
 		q.Name, // routing key

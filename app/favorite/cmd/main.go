@@ -1,31 +1,38 @@
 package main
 
 import (
-	"Douyin/app/relation/dao/mysql"
-	"Douyin/app/relation/dao/redis"
-	"Douyin/app/relation/service"
+	"Douyin/app/favorite/dao/mysql"
+	"Douyin/app/favorite/dao/redis"
+	"Douyin/app/favorite/script"
+	"Douyin/app/favorite/service"
 	"Douyin/config"
 	"Douyin/discovery"
-	"Douyin/idl/relation/relationPb"
+	"Douyin/idl/favorite/favoritePb"
+	"Douyin/mq"
+	"context"
 	"fmt"
-	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"log"
 	"net"
+
+	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 )
 
 func main() {
+	// 初始化配置
 	config.InitConfig()
+	// 初始化 mysql 服务
 	mysql.InitMysql()
+	// 初始化 redis 服务
 	redis.InitRedis()
+	// 初始化 mq
+	mq.InitRabbitMQ()
+	// TODO	loadScript() 作用： 同步落库
+	loadingScript()
 
-	// 注册本服务
+	// 注册服务
 	registerService()
-}
 
-type gRPCRegisterConfig struct {
-	Addr         string
-	RegisterFunc func(g *grpc.Server)
 }
 
 func registerService() {
@@ -35,17 +42,22 @@ func registerService() {
 	registerGrpcService()
 }
 
+type gRPCRegisterConfig struct {
+	Addr         string
+	RegisterFunc func(g *grpc.Server)
+}
+
 // 注册本服务到 grpc 服务器
 func registerGrpcService() {
-	// 创建 gRPC 服务器, 设置最大接收和发送消息大小为 32MB
+	// 创建 gRPC 服务器
 	s := grpc.NewServer()
 	defer s.Stop()
 
 	// TODO 不同： 向 grpc服务器 执行服务注册
 	cfg := gRPCRegisterConfig{
-		Addr: config.Config.ServiceConfig.RelationServiceAddress,
+		Addr: config.Config.ServiceConfig.FavoriteServiceAddress,
 		RegisterFunc: func(g *grpc.Server) {
-			relationPb.RegisterRelationServiceServer(g, service.NewRelationService())
+			favoritePb.RegisterFavoriteServiceServer(g, service.NewFavoriteService())
 		},
 	}
 	cfg.RegisterFunc(s)
@@ -69,7 +81,7 @@ func registerGrpcService() {
 
 // 注册服务到 etcd
 func registerEtcdService() {
-	// 获取 etcd 地址并创建 etcd 服务注册器
+	// 获取 etcd 地址
 	etcd_addr := fmt.Sprintf("%s:%d", config.Config.EtcdConfig.EtcdHost, config.Config.EtcdConfig.EtcdPort)
 	// 创建 etcd 注册器
 	r := discovery.NewRegister([]string{etcd_addr}, logrus.New())
@@ -77,8 +89,8 @@ func registerEtcdService() {
 
 	// TODO 不同：构造服务节点信息
 	info := discovery.Server{
-		Name: config.Config.Domain.RelationServiceDomain,
-		Addr: config.Config.ServiceConfig.RelationServiceAddress,
+		Name: config.Config.Domain.FavoriteServiceDomain,
+		Addr: config.Config.ServiceConfig.FavoriteServiceAddress,
 	}
 	logrus.Println(info)
 
@@ -87,4 +99,10 @@ func registerEtcdService() {
 	if err != nil {
 		logrus.Fatalln(err)
 	}
+}
+
+func loadingScript() {
+	ctx := context.Background()
+	go script.FavoriteCreateSync(ctx)
+	go script.FavoriteDeleteSync(ctx)
 }

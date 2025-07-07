@@ -3,6 +3,9 @@ package rpc
 import (
 	"Douyin/config"
 	"Douyin/discovery"
+	"Douyin/idl/comment/commentPb"
+	"Douyin/idl/favorite/favoritePb"
+	"Douyin/idl/message/messagePb"
 	"Douyin/idl/relation/relationPb"
 	"Douyin/idl/testsrv/testsrvPb"
 	"Douyin/idl/user/userPb"
@@ -28,6 +31,9 @@ var (
 	UserClient     userPb.UserServiceClient
 	VideoClient    videoPb.VideoServiceClient
 	RelationClient relationPb.RelationServiceClient
+	FavoriteClient favoritePb.FavoriteServiceClient
+	CommentClient  commentPb.CommentServiceClient
+	MessageClient  messagePb.MessageServiceClient
 )
 
 // Init 初始化 RPC 客户端连接
@@ -37,6 +43,7 @@ func InitRpc() {
 	Register = discovery.NewResolver([]string{EtcdAddress}, logrus.New())
 	resolver.Register(Register)
 	ctx, CancelFunc = context.WithTimeout(context.Background(), 3*time.Second)
+	defer CancelFunc()
 
 	defer Register.Close()
 	// TODO 这里进行 rpc客户端 初始化
@@ -44,6 +51,9 @@ func InitRpc() {
 	initClient(config.Config.Domain.UserServiceDomain, &UserClient)
 	initClient(config.Config.Domain.VideoServiceDomain, &VideoClient)
 	initClient(config.Config.Domain.RelationServiceDomain, &RelationClient)
+	initClient(config.Config.Domain.FavoriteServiceDomain, &FavoriteClient)
+	initClient(config.Config.Domain.CommentServiceDomain, &CommentClient)
+	initClient(config.Config.Domain.MessageServiceDomain, &MessageClient)
 }
 
 // TODO 初始化客户端
@@ -64,6 +74,12 @@ func initClient(serviceName string, client interface{}) {
 		*c = videoPb.NewVideoServiceClient(conn)
 	case *relationPb.RelationServiceClient:
 		*c = relationPb.NewRelationServiceClient(conn)
+	case *favoritePb.FavoriteServiceClient:
+		*c = favoritePb.NewFavoriteServiceClient(conn)
+	case *commentPb.CommentServiceClient:
+		*c = commentPb.NewCommentServiceClient(conn)
+	case *messagePb.MessageServiceClient:
+		*c = messagePb.NewMessageServiceClient(conn)
 	default:
 		panic("unsupported client type")
 	}
@@ -80,7 +96,7 @@ func connectServer(serviceName string) (conn *grpc.ClientConn, err error) {
 	// 调试信息
 	log.Printf("Resolving address: %s", addr)
 
-	// TODO 建立 gRPC 连接：使用上下文控制超时  （暂时弃用）
+	// TODO 建立 gRPC 连接：使用上下文控制超时  【已弃用】（暂时使用）
 	conn, err = grpc.Dial(addr, opts...)
 	if err != nil {
 		log.Printf("连接 %s 失败: %v", addr, err)

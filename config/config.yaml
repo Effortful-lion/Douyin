@@ -55,7 +55,7 @@ User:
   Background: "https://ts1.tc.mm.bing.net/th/id/R-C.66d7b796377883a92aad65b283ef1f84?rik=sQ%2fKoYAcr%2bOwsw&riu=http%3a%2f%2fwww.quazero.com%2fuploads%2fallimg%2f140305%2f1-140305131415.jpg&ehk=Hxl%2fQ9pbEiuuybrGWTEPJOhvrFK9C3vyCcWicooXfNE%3d&risl=&pid=ImgRaw&r=0"
   Signature: 又来看我的主页啦~
 
-# TODO 阿里云 oss 配置
+# TODO 阿里云 oss 配置 或者 七牛云配置
 AliYun:
   Bucket: your bucket
   AccessKey: your access key

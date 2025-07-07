@@ -21,6 +21,7 @@ type AppConfig struct {
 	RabbitMQConfig RabbitMQConfig `mapstructure:"RabbitMQ"`
 	AliyunConfig   AliyunConfig   `mapstructure:"AliYun"` // 改为 AliYun
 	Domain         Domain         `mapstructure:"Domain"`
+	User           User           `mapstructure:"User"`
 }
 
 // mysql配置
@@ -70,10 +71,10 @@ type RabbitMQConfig struct {
 
 // aliyun配置
 type AliyunConfig struct {
-	BucketName string `mapstructure:"Bucket"` // 改为 Bucket
-	AccessKey  string `mapstructure:"AccessKey"`
-	SecretKey  string `mapstructure:"SecretKey"`
-	Domain     string `mapstructure:"Domain"`
+	Bucket    string `mapstructure:"Bucket"` // 改为 Bucket
+	AccessKey string `mapstructure:"AccessKey"`
+	SecretKey string `mapstructure:"SecretKey"`
+	Domain    string `mapstructure:"Domain"`
 }
 
 // 服务配置(记录多个服务节点)
@@ -95,6 +96,12 @@ type Domain struct {
 	CommentServiceDomain  string `mapstructure:"CommentServiceDomain"`
 	RelationServiceDomain string `mapstructure:"RelationServiceDomain"`
 	MessageServiceDomain  string `mapstructure:"MessageServiceDomain"`
+}
+
+type User struct {
+	Avatar     string `mapstructure:"Avatar"`
+	Background string `mapstructure:"Background"`
+	Signature  string `mapstructure:"Signature"`
 }
 
 func InitConfig() {

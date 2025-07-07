@@ -51,6 +51,12 @@ const (
 	CodeFollowFail
 )
 
+// Douyin 视频流
+const (
+	CodeVideoFeedSuccess ResCode = iota
+	CodeVideoFeedFail
+)
+
 func (c ResCode) Msg() string {
 	msg, ok := codeMsgMap[c]
 	if !ok {

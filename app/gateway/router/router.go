@@ -2,6 +2,8 @@ package router
 
 import (
 	"Douyin/app/gateway/http"
+	"Douyin/app/gateway/middleware"
+	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,10 +14,20 @@ func NewRouter() *gin.Engine {
 }
 
 func InitRouter(r *gin.Engine) *gin.Engine {
+
+	// 中间件: jwt 鉴权、跨域
+	r.Use(
+		middleware.JWT(),
+		cors.Default(),
+	)
+
+	// 抖音接口
 	DouyinGroup := r.Group("/douyin")
 
+	DouyinGroup.GET("feed", http.NewPublishHandler().FeedHandler)
+
 	{
-		// 用户模块
+		// 用户模块 ok
 		UserGroup := DouyinGroup.Group("/user")
 		{
 			UserGroup.POST("/register", http.NewUserHandler().RegisterHandler)
@@ -32,7 +44,7 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 			PublishGroup.GET("/list/", http.NewPublishHandler().PublishListHandler)
 		}
 
-		// 社交模块
+		// 社交模块 ok
 		RelationGroup := DouyinGroup.Group("/relation")
 		{
 			// 关注操作
@@ -43,6 +55,27 @@ func InitRouter(r *gin.Engine) *gin.Engine {
 			RelationGroup.GET("/follower/list/", http.NewRelationHandler().ListFollowerRelationHandler)
 			// 好友列表
 			RelationGroup.GET("/friend/list/", http.NewRelationHandler().ListFriendRelationHandler)
+		}
+
+		// 点赞模块
+		FavoriteGroup := DouyinGroup.Group("/favorite")
+		{
+			FavoriteGroup.POST("/action/", http.NewFavoriteHandler().FavoriteActionHandler)
+			FavoriteGroup.GET("/list/", http.NewFavoriteHandler().FavoriteListHandler)
+		}
+
+		// 评论模块
+		CommentGroup := DouyinGroup.Group("/comment")
+		{
+			CommentGroup.POST("/action/", http.NewCommentHandler().CommentActionHandler)
+			CommentGroup.GET("/list/", http.NewCommentHandler().CommentListHandler)
+		}
+
+		// 消息模块
+		MessageGroup := DouyinGroup.Group("/message")
+		{
+			MessageGroup.POST("/action/", http.NewMessageHandler().ActionMessageHandler)
+			MessageGroup.GET("/chat/", http.NewMessageHandler().ChatMessageHandler)
 		}
 
 	}

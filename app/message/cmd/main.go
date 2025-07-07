@@ -1,12 +1,12 @@
 package main
 
 import (
-	"Douyin/app/relation/dao/mysql"
-	"Douyin/app/relation/dao/redis"
-	"Douyin/app/relation/service"
+	"Douyin/app/message/dao/mysql"
+	"Douyin/app/message/dao/redis"
+	"Douyin/app/message/service"
 	"Douyin/config"
 	"Douyin/discovery"
-	"Douyin/idl/relation/relationPb"
+	"Douyin/idl/message/messagePb"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -19,7 +19,7 @@ func main() {
 	mysql.InitMysql()
 	redis.InitRedis()
 
-	// 注册本服务
+	// 服务注册
 	registerService()
 }
 
@@ -43,9 +43,9 @@ func registerGrpcService() {
 
 	// TODO 不同： 向 grpc服务器 执行服务注册
 	cfg := gRPCRegisterConfig{
-		Addr: config.Config.ServiceConfig.RelationServiceAddress,
+		Addr: config.Config.ServiceConfig.MessageServiceAddress,
 		RegisterFunc: func(g *grpc.Server) {
-			relationPb.RegisterRelationServiceServer(g, service.NewRelationService())
+			messagePb.RegisterMessageServiceServer(g, service.NewMessageService())
 		},
 	}
 	cfg.RegisterFunc(s)
@@ -77,8 +77,8 @@ func registerEtcdService() {
 
 	// TODO 不同：构造服务节点信息
 	info := discovery.Server{
-		Name: config.Config.Domain.RelationServiceDomain,
-		Addr: config.Config.ServiceConfig.RelationServiceAddress,
+		Name: config.Config.Domain.MessageServiceDomain,
+		Addr: config.Config.ServiceConfig.MessageServiceAddress,
 	}
 	logrus.Println(info)
 

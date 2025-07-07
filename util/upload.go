@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"strings"
 
+	// TODO 到时候再修改
 	"github.com/qiniu/go-sdk/v7/auth/qbox"
 	"github.com/qiniu/go-sdk/v7/storage"
 )
@@ -16,9 +17,9 @@ func UploadVideo(data []byte) (VideoUrl string, err error) {
 	size := int64(len(data))
 	key := fmt.Sprintf("%s.mp4", GenerateUUID())
 	putPolicy := storage.PutPolicy{
-		Scope: fmt.Sprintf("%s:%s", config.Bucket, key),
+		Scope: fmt.Sprintf("%s:%s", config.Config.AliyunConfig.Bucket, key),
 	}
-	mac := qbox.NewMac(config.AccessKey, config.SecretKey)
+	mac := qbox.NewMac(config.Config.AliyunConfig.AccessKey, config.Config.AliyunConfig.SecretKey)
 	upToken := putPolicy.UploadToken(mac)
 	cfg := storage.Config{}
 	uploader := storage.NewFormUploader(&cfg)
@@ -33,19 +34,19 @@ func UploadVideo(data []byte) (VideoUrl string, err error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("%s/%s", config.Domain, ret.Key), nil
+	return fmt.Sprintf("%s/%s", config.Config.AliyunConfig.Domain, ret.Key), nil
 }
 
 func UploadJPG(imgPath string, videoUrl string) string {
 	config.InitConfig()
 
-	videoName := strings.Split(strings.Replace(videoUrl, config.Domain+"/", "", -1), ".")[0]
+	videoName := strings.Split(strings.Replace(videoUrl, config.Config.AliyunConfig.Domain+"/", "", -1), ".")[0]
 	key := fmt.Sprintf("%s.%s", videoName+"_cover", "jpg")
 
 	putPolicy := storage.PutPolicy{
-		Scope: config.Bucket,
+		Scope: config.Config.AliyunConfig.Bucket,
 	}
-	mac := qbox.NewMac(config.AccessKey, config.SecretKey)
+	mac := qbox.NewMac(config.Config.AliyunConfig.AccessKey, config.Config.AliyunConfig.SecretKey)
 	upToken := putPolicy.UploadToken(mac)
 	cfg := storage.Config{}
 
@@ -64,5 +65,5 @@ func UploadJPG(imgPath string, videoUrl string) string {
 		fmt.Println(err)
 		return ""
 	}
-	return fmt.Sprintf("%s/%s", config.Domain, ret.Key)
+	return fmt.Sprintf("%s/%s", config.Config.AliyunConfig.Domain, ret.Key)
 }

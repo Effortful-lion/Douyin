@@ -17,6 +17,29 @@ func NewPublishHandler() *PublishHandler {
 	return &PublishHandler{}
 }
 
+func (p *PublishHandler) FeedHandler(ctx *gin.Context) {
+	var req videoPb.FeedRequest
+	LatestTime, _ := strconv.Atoi(ctx.Query("latest_time"))
+	req.LatestTime = int64(LatestTime)
+	req.Token = ctx.Query("token")
+	var res *videoPb.FeedResponse
+	//hystrix.ConfigureCommand("Feed", wrapper.FeedFuseConfig)
+	//err := hystrix.Do("Feed", func() (err error) {
+	//	res, err = rpc.Feed(ctx, &req)
+	//	return err
+	//}, func(err error) error {
+	//	//降级处理
+	//	wrapper.DefaultFeed(res)
+	//	return err
+	//})
+	res, err := rpc.Feed(ctx, &req)
+	if err != nil {
+		resp.ResponseError(ctx, resp.CodeInvalidParams, err)
+		return
+	}
+	resp.ResponseSuccess(ctx, res)
+}
+
 func (p *PublishHandler) PublishListHandler(ctx *gin.Context) {
 	var req videoPb.PublishListRequest
 	uid, _ := strconv.Atoi(ctx.Query("user_id"))

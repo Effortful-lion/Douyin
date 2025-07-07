@@ -3,11 +3,13 @@ package main
 import (
 	"Douyin/app/video/dao/mysql"
 	"Douyin/app/video/dao/redis"
+	"Douyin/app/video/script"
 	"Douyin/app/video/service"
 	"Douyin/config"
 	"Douyin/discovery"
 	"Douyin/idl/video/videoPb"
 	"Douyin/mq"
+	"context"
 	"fmt"
 	"log"
 	"net"
@@ -21,9 +23,16 @@ func main() {
 	mysql.InitMysql()
 	redis.InitRedis()
 	mq.InitRabbitMQ()
+	loadingScript()
 
 	// 注册本服务
 	registerService()
+}
+
+func loadingScript() {
+	ctx := context.Background()
+	go script.VideoCreateSync(ctx)
+	go script.Video2RedisSync(ctx)
 }
 
 type gRPCRegisterConfig struct {
